@@ -81,3 +81,18 @@ func TestChi(t *testing.T) {
 	sU64 = chiU64Version(sU64)
 	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
 }
+
+func TestIota(t *testing.T) {
+	s, sU64 := newS()
+
+	s = iot(s, 3)
+	sU64 = iotU64Version(sU64, 3)
+
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+	qt.Assert(t, bitsToU64(s[0:64]), qt.Equals, uint64(9223372039002292224))
+
+	// compute again theta on the current state
+	s = iot(s, 10)
+	sU64 = iotU64Version(sU64, 10)
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+}

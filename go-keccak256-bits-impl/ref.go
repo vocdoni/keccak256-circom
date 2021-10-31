@@ -135,3 +135,9 @@ func chiU64Version(a [25]uint64) [25]uint64 {
 	a[24] ^= (^bc0) & bc1
 	return a
 }
+
+func iotU64Version(a [25]uint64, r int) [25]uint64 {
+	// iota
+	a[0] ^= roundConstantsU64[r]
+	return a
+}
