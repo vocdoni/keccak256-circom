@@ -54,6 +54,13 @@ func u64ToBits(u uint64) []bool {
 	by := u64ToBytes(u)
 	return bytesToBits(by)
 }
+func byteToBits(b byte) []bool {
+	var bits []bool
+	for j := 0; j < 8; j++ {
+		bits = append(bits, b&(1<<j) > 0)
+	}
+	return bits
+}
 func bytesToBits(b []byte) []bool {
 	var bits []bool
 	for i := 0; i < len(b); i++ {

@@ -1,7 +1,9 @@
 /*
 This file contains the byte & uint64 implementations that are used as reference
 to test the bits implementations of the other files.
-The methods in this file are modifyied versions of methods from: https://github.com/ebfe/keccak
+
+The methods in this file (thetaU64Version, rhopiU64Version, chiU64Version,
+iotU64Version) are modified versions of methods from: https://github.com/ebfe/keccak
 */
 package keccak
 
