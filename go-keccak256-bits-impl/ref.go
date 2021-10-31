@@ -80,3 +80,58 @@ func rhopiU64Version(a [25]uint64) [25]uint64 {
 	a[1] = t<<44 | t>>(64-44)
 	return a
 }
+
+func chiU64Version(a [25]uint64) [25]uint64 {
+	var bc0, bc1, bc2, bc3, bc4 uint64
+	bc0 = a[0]
+	bc1 = a[1]
+	bc2 = a[2]
+	bc3 = a[3]
+	bc4 = a[4]
+	a[0] ^= (^bc1) & bc2
+	a[1] ^= (^bc2) & bc3
+	a[2] ^= (^bc3) & bc4
+	a[3] ^= (^bc4) & bc0
+	a[4] ^= (^bc0) & bc1
+	bc0 = a[5]
+	bc1 = a[6]
+	bc2 = a[7]
+	bc3 = a[8]
+	bc4 = a[9]
+	a[5] ^= (^bc1) & bc2
+	a[6] ^= (^bc2) & bc3
+	a[7] ^= (^bc3) & bc4
+	a[8] ^= (^bc4) & bc0
+	a[9] ^= (^bc0) & bc1
+	bc0 = a[10]
+	bc1 = a[11]
+	bc2 = a[12]
+	bc3 = a[13]
+	bc4 = a[14]
+	a[10] ^= (^bc1) & bc2
+	a[11] ^= (^bc2) & bc3
+	a[12] ^= (^bc3) & bc4
+	a[13] ^= (^bc4) & bc0
+	a[14] ^= (^bc0) & bc1
+	bc0 = a[15]
+	bc1 = a[16]
+	bc2 = a[17]
+	bc3 = a[18]
+	bc4 = a[19]
+	a[15] ^= (^bc1) & bc2
+	a[16] ^= (^bc2) & bc3
+	a[17] ^= (^bc3) & bc4
+	a[18] ^= (^bc4) & bc0
+	a[19] ^= (^bc0) & bc1
+	bc0 = a[20]
+	bc1 = a[21]
+	bc2 = a[22]
+	bc3 = a[23]
+	bc4 = a[24]
+	a[20] ^= (^bc1) & bc2
+	a[21] ^= (^bc2) & bc3
+	a[22] ^= (^bc3) & bc4
+	a[23] ^= (^bc4) & bc0
+	a[24] ^= (^bc0) & bc1
+	return a
+}

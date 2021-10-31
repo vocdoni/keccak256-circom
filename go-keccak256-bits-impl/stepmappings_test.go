@@ -61,3 +61,23 @@ func TestRhoPi(t *testing.T) {
 	sU64 = rhopiU64Version(sU64)
 	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
 }
+
+func TestChi(t *testing.T) {
+	s, sU64 := newS()
+
+	s = chi(s)
+	sU64 = chiU64Version(sU64)
+
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals,
+		[]uint64{2, 0, 6, 3, 5, 4, 14, 6, 12, 11, 14, 10, 14, 13, 15,
+			14, 18, 16, 30, 3, 22, 20, 30, 19, 25})
+
+	// compute again theta on the current state
+	s = rhopi(s)
+	sU64 = rhopiU64Version(sU64)
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+	s = chi(s)
+	sU64 = chiU64Version(sU64)
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+}

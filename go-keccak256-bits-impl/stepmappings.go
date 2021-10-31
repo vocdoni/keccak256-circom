@@ -150,3 +150,69 @@ func rhopi(a [25 * 64]bool) [25 * 64]bool {
 	copy(r[1*64:2*64], or(leftShift(t[:], 44), rightShift(t[:], 64-44)))
 	return r
 }
+
+func chi(a [25 * 64]bool) [25 * 64]bool {
+	var c0, c1, c2, c3, c4 [64]bool
+	var r [25 * 64]bool
+
+	copy(c0[:], a[0:1*64])
+	copy(c1[:], a[1*64:2*64])
+	copy(c2[:], a[2*64:3*64])
+	copy(c3[:], a[3*64:4*64])
+	copy(c4[:], a[4*64:5*64])
+
+	copy(r[0:1*64], xor(a[0:1*64], and(xorSingle(c1[:]), c2[:])))
+	copy(r[1*64:2*64], xor(a[1*64:2*64], and(xorSingle(c2[:]), c3[:])))
+	copy(r[2*64:3*64], xor(a[2*64:3*64], and(xorSingle(c3[:]), c4[:])))
+	copy(r[3*64:4*64], xor(a[3*64:4*64], and(xorSingle(c4[:]), c0[:])))
+	copy(r[4*64:5*64], xor(a[4*64:5*64], and(xorSingle(c0[:]), c1[:])))
+
+	copy(c0[:], a[5*64:6*64])
+	copy(c1[:], a[6*64:7*64])
+	copy(c2[:], a[7*64:8*64])
+	copy(c3[:], a[8*64:9*64])
+	copy(c4[:], a[9*64:10*64])
+
+	copy(r[5*64:6*64], xor(a[5*64:6*64], and(xorSingle(c1[:]), c2[:])))
+	copy(r[6*64:7*64], xor(a[6*64:7*64], and(xorSingle(c2[:]), c3[:])))
+	copy(r[7*64:8*64], xor(a[7*64:8*64], and(xorSingle(c3[:]), c4[:])))
+	copy(r[8*64:9*64], xor(a[8*64:9*64], and(xorSingle(c4[:]), c0[:])))
+	copy(r[9*64:10*64], xor(a[9*64:10*64], and(xorSingle(c0[:]), c1[:])))
+
+	copy(c0[:], a[10*64:11*64])
+	copy(c1[:], a[11*64:12*64])
+	copy(c2[:], a[12*64:13*64])
+	copy(c3[:], a[13*64:14*64])
+	copy(c4[:], a[14*64:15*64])
+
+	copy(r[10*64:11*64], xor(a[10*64:11*64], and(xorSingle(c1[:]), c2[:])))
+	copy(r[11*64:12*64], xor(a[11*64:12*64], and(xorSingle(c2[:]), c3[:])))
+	copy(r[12*64:13*64], xor(a[12*64:13*64], and(xorSingle(c3[:]), c4[:])))
+	copy(r[13*64:14*64], xor(a[13*64:14*64], and(xorSingle(c4[:]), c0[:])))
+	copy(r[14*64:15*64], xor(a[14*64:15*64], and(xorSingle(c0[:]), c1[:])))
+
+	copy(c0[:], a[15*64:16*64])
+	copy(c1[:], a[16*64:17*64])
+	copy(c2[:], a[17*64:18*64])
+	copy(c3[:], a[18*64:19*64])
+	copy(c4[:], a[19*64:20*64])
+
+	copy(r[15*64:16*64], xor(a[15*64:16*64], and(xorSingle(c1[:]), c2[:])))
+	copy(r[16*64:17*64], xor(a[16*64:17*64], and(xorSingle(c2[:]), c3[:])))
+	copy(r[17*64:18*64], xor(a[17*64:18*64], and(xorSingle(c3[:]), c4[:])))
+	copy(r[18*64:19*64], xor(a[18*64:19*64], and(xorSingle(c4[:]), c0[:])))
+	copy(r[19*64:20*64], xor(a[19*64:20*64], and(xorSingle(c0[:]), c1[:])))
+
+	copy(c0[:], a[20*64:21*64])
+	copy(c1[:], a[21*64:22*64])
+	copy(c2[:], a[22*64:23*64])
+	copy(c3[:], a[23*64:24*64])
+	copy(c4[:], a[24*64:25*64])
+
+	copy(r[20*64:21*64], xor(a[20*64:21*64], and(xorSingle(c1[:]), c2[:])))
+	copy(r[21*64:22*64], xor(a[21*64:22*64], and(xorSingle(c2[:]), c3[:])))
+	copy(r[22*64:23*64], xor(a[22*64:23*64], and(xorSingle(c3[:]), c4[:])))
+	copy(r[23*64:24*64], xor(a[23*64:24*64], and(xorSingle(c4[:]), c0[:])))
+	copy(r[24*64:25*64], xor(a[24*64:25*64], and(xorSingle(c0[:]), c1[:])))
+	return r
+}
