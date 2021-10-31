@@ -1,6 +1,7 @@
 /*
-This file contains the byte & uint64 implementations that are used to test the
-bits implementations.
+This file contains the byte & uint64 implementations that are used as reference
+to test the bits implementations of the other files.
+The methods in this file are modifyied versions of methods from: https://github.com/ebfe/keccak
 */
 package keccak
 
@@ -48,4 +49,34 @@ func thetaU64Version(a [25]uint64) [25]uint64 {
 	r[19] = a[19] ^ d
 	r[24] = a[24] ^ d
 	return r
+}
+
+func rhopiU64Version(a [25]uint64) [25]uint64 {
+	var t uint64
+	t = a[1]
+	t, a[10] = a[10], t<<1|t>>(64-1)
+	t, a[7] = a[7], t<<3|t>>(64-3)
+	t, a[11] = a[11], t<<6|t>>(64-6)
+	t, a[17] = a[17], t<<10|t>>(64-10)
+	t, a[18] = a[18], t<<15|t>>(64-15)
+	t, a[3] = a[3], t<<21|t>>(64-21)
+	t, a[5] = a[5], t<<28|t>>(64-28)
+	t, a[16] = a[16], t<<36|t>>(64-36)
+	t, a[8] = a[8], t<<45|t>>(64-45)
+	t, a[21] = a[21], t<<55|t>>(64-55)
+	t, a[24] = a[24], t<<2|t>>(64-2)
+	t, a[4] = a[4], t<<14|t>>(64-14)
+	t, a[15] = a[15], t<<27|t>>(64-27)
+	t, a[23] = a[23], t<<41|t>>(64-41)
+	t, a[19] = a[19], t<<56|t>>(64-56)
+	t, a[13] = a[13], t<<8|t>>(64-8)
+	t, a[12] = a[12], t<<25|t>>(64-25)
+	t, a[2] = a[2], t<<43|t>>(64-43)
+	t, a[20] = a[20], t<<62|t>>(64-62)
+	t, a[14] = a[14], t<<18|t>>(64-18)
+	t, a[22] = a[22], t<<39|t>>(64-39)
+	t, a[9] = a[9], t<<61|t>>(64-61)
+	t, a[6] = a[6], t<<20|t>>(64-20)
+	a[1] = t<<44 | t>>(64-44)
+	return a
 }

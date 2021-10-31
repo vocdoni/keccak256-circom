@@ -41,3 +41,23 @@ func TestTheta(t *testing.T) {
 	sU64 = thetaU64Version(sU64)
 	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
 }
+
+func TestRhoPi(t *testing.T) {
+	s, sU64 := newS()
+
+	s = rhopi(s)
+	sU64 = rhopiU64Version(sU64)
+
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals,
+		[]uint64{0, 105553116266496, 105553116266496, 37748736, 393216,
+			805306368, 9437184, 80, 562949953421312, 13835058055282163714,
+			2, 448, 436207616, 4864, 5242880, 536870912, 343597383680,
+			11264, 557056, 1657324662872342528, 9223372036854775808,
+			288230376151711744, 7696581394432, 32985348833280, 84})
+
+	// compute again rhopi on the current state
+	s = rhopi(s)
+	sU64 = rhopiU64Version(sU64)
+	qt.Assert(t, bitsToU64Array(s[:]), qt.DeepEquals, sU64[:])
+}
