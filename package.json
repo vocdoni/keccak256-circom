@@ -1,0 +1,23 @@
+{
+  "name": "keccak-circom",
+  "version": "0.0.1",
+  "description": "Keccak256 hash ethereum compatible implementation in Circom",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --max-old-space-size=4000"
+  },
+  "author": "arnaucube",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "circomlib": "^2.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "circom_tester": "0.0.5",
+    "mocha": "^9.1.2",
+    "keccak256": "1.0.3"
+  }
+}
