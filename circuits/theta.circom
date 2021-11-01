@@ -1,67 +1,7 @@
 pragma circom 2.0.0;
 
-include "../node_modules/circomlib/circuits/gates.circom";
-include "../node_modules/circomlib/circuits/sha256/xor3.circom";
-include "../node_modules/circomlib/circuits/sha256/shift.circom"; // contains ShiftRight
+include "./utils.circom";
 
-template Xor5(n) {
-    signal input a[n];
-    signal input b[n];
-    signal input c[n];
-    signal input d[n];
-    signal input e[n];
-    signal output out[n];
-    var i;
-    
-    component xor3 = Xor3(n);
-    for (i=0; i<n; i++) {
-        xor3.a[i] <== a[i];
-        xor3.b[i] <== b[i];
-        xor3.c[i] <== c[i];
-    }
-    component xor4 = XorArray(n);
-    for (i=0; i<n; i++) {
-        xor4.a[i] <== xor3.out[i];
-        xor4.b[i] <== d[i];
-    }
-    component xor5 = XorArray(n);
-    for (i=0; i<n; i++) {
-        xor5.a[i] <== xor4.out[i];
-        xor5.b[i] <== e[i];
-    }
-    for (i=0; i<n; i++) {
-        out[i] <== xor5.out[i];
-    }
-}
-template XorArray(n) {
-    signal input a[n];
-    signal input b[n];
-    signal output out[n];
-    var i;
-
-    component aux[n];
-    for (i=0; i<n; i++) {
-        aux[i] = XOR();
-        aux[i].a <== a[i];
-        aux[i].b <== b[i];
-    }
-    for (i=0; i<n; i++) {
-        out[i] <== aux[i].out;
-    }
-}
-
-template ShL(n, r) {
-    signal input in[n];
-    signal output out[n];
-
-    for (var i=0; i<n; i++) {
-        if (i < r) {
-            out[i] <== 0;
-        } else {
-            out[i] <== in[ i-r ];
-        }
-    }
-}
 
 template D(n, shl, shr) {
     // d = b ^ (a<<shl | a>>shr)
@@ -78,16 +18,15 @@ template D(n, shl, shr) {
     for (i=0; i<64; i++) {
         aux1.in[i] <== a[i];
     }
-    component aux2[64];
+    component aux2 = OrArray(64);
     for (i=0; i<64; i++) {
-        aux2[i] = OR();
-        aux2[i].a <== aux0.out[i];
-        aux2[i].b <== aux1.out[i];
+        aux2.a[i] <== aux0.out[i];
+        aux2.b[i] <== aux1.out[i];
     }
     component aux3 = XorArray(64);
     for (i=0; i<64; i++) {
         aux3.a[i] <== b[i];
-        aux3.b[i] <== aux2[i].out;
+        aux3.b[i] <== aux2.out[i];
     }
     for (i=0; i<64; i++) {
         out[i] <== aux3.out[i];

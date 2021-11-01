@@ -48,106 +48,57 @@ func theta(a [25 * 64]bool) [25 * 64]bool {
 }
 
 func rhopi(a [25 * 64]bool) [25 * 64]bool {
-	var t, tAux [64]bool
 	var r [25 * 64]bool
 
 	copy(r[0:1*64], a[0:1*64])
 
-	copy(t[:], a[1*64:2*64])
+	copy(r[10*64:11*64], or(leftShift(a[1*64:2*64], 1), rightShift(a[1*64:2*64], 64-1)))
 
-	copy(tAux[:], a[10*64:11*64])
-	copy(r[10*64:11*64], or(leftShift(t[:], 1), rightShift(t[:], 64-1)))
-	copy(t[:], tAux[:])
+	copy(r[7*64:8*64], or(leftShift(a[10*64:11*64], 3), rightShift(a[10*64:11*64], 64-3)))
 
-	copy(tAux[:], a[7*64:8*64])
-	copy(r[7*64:8*64], or(leftShift(t[:], 3), rightShift(t[:], 64-3)))
-	copy(t[:], tAux[:])
+	copy(r[11*64:12*64], or(leftShift(a[7*64:8*64], 6), rightShift(a[7*64:8*64], 64-6)))
 
-	copy(tAux[:], a[11*64:12*64])
-	copy(r[11*64:12*64], or(leftShift(t[:], 6), rightShift(t[:], 64-6)))
-	copy(t[:], tAux[:])
+	copy(r[17*64:18*64], or(leftShift(a[11*64:12*64], 10), rightShift(a[11*64:12*64], 64-10)))
 
-	copy(tAux[:], a[17*64:18*64])
-	copy(r[17*64:18*64], or(leftShift(t[:], 10), rightShift(t[:], 64-10)))
-	copy(t[:], tAux[:])
+	copy(r[18*64:19*64], or(leftShift(a[17*64:18*64], 15), rightShift(a[17*64:18*64], 64-15)))
 
-	copy(tAux[:], a[18*64:19*64])
-	copy(r[18*64:19*64], or(leftShift(t[:], 15), rightShift(t[:], 64-15)))
-	copy(t[:], tAux[:])
+	copy(r[3*64:4*64], or(leftShift(a[18*64:19*64], 21), rightShift(a[18*64:19*64], 64-21)))
 
-	copy(tAux[:], a[3*64:4*64])
-	copy(r[3*64:4*64], or(leftShift(t[:], 21), rightShift(t[:], 64-21)))
-	copy(t[:], tAux[:])
+	copy(r[5*64:6*64], or(leftShift(a[3*64:4*64], 28), rightShift(a[3*64:4*64], 64-28)))
 
-	copy(tAux[:], a[5*64:6*64])
-	copy(r[5*64:6*64], or(leftShift(t[:], 28), rightShift(t[:], 64-28)))
-	copy(t[:], tAux[:])
+	copy(r[16*64:17*64], or(leftShift(a[5*64:6*64], 36), rightShift(a[5*64:6*64], 64-36)))
 
-	copy(tAux[:], a[16*64:17*64])
-	copy(r[16*64:17*64], or(leftShift(t[:], 36), rightShift(t[:], 64-36)))
-	copy(t[:], tAux[:])
+	copy(r[8*64:9*64], or(leftShift(a[16*64:17*64], 45), rightShift(a[16*64:17*64], 64-45)))
 
-	copy(tAux[:], a[8*64:9*64])
-	copy(r[8*64:9*64], or(leftShift(t[:], 45), rightShift(t[:], 64-45)))
-	copy(t[:], tAux[:])
+	copy(r[21*64:22*64], or(leftShift(a[8*64:9*64], 55), rightShift(a[8*64:9*64], 64-55)))
 
-	copy(tAux[:], a[21*64:22*64])
-	copy(r[21*64:22*64], or(leftShift(t[:], 55), rightShift(t[:], 64-55)))
-	copy(t[:], tAux[:])
+	copy(r[24*64:25*64], or(leftShift(a[21*64:22*64], 2), rightShift(a[21*64:22*64], 64-2)))
 
-	copy(tAux[:], a[24*64:25*64])
-	copy(r[24*64:25*64], or(leftShift(t[:], 2), rightShift(t[:], 64-2)))
-	copy(t[:], tAux[:])
+	copy(r[4*64:5*64], or(leftShift(a[24*64:25*64], 14), rightShift(a[24*64:25*64], 64-14)))
 
-	copy(tAux[:], a[4*64:5*64])
-	copy(r[4*64:5*64], or(leftShift(t[:], 14), rightShift(t[:], 64-14)))
-	copy(t[:], tAux[:])
+	copy(r[15*64:16*64], or(leftShift(a[4*64:5*64], 27), rightShift(a[4*64:5*64], 64-27)))
 
-	copy(tAux[:], a[15*64:16*64])
-	copy(r[15*64:16*64], or(leftShift(t[:], 27), rightShift(t[:], 64-27)))
-	copy(t[:], tAux[:])
+	copy(r[23*64:24*64], or(leftShift(a[15*64:16*64], 41), rightShift(a[15*64:16*64], 64-41)))
 
-	copy(tAux[:], a[23*64:24*64])
-	copy(r[23*64:24*64], or(leftShift(t[:], 41), rightShift(t[:], 64-41)))
-	copy(t[:], tAux[:])
+	copy(r[19*64:20*64], or(leftShift(a[23*64:24*64], 56), rightShift(a[23*64:24*64], 64-56)))
 
-	copy(tAux[:], a[19*64:20*64])
-	copy(r[19*64:20*64], or(leftShift(t[:], 56), rightShift(t[:], 64-56)))
-	copy(t[:], tAux[:])
+	copy(r[13*64:14*64], or(leftShift(a[19*64:20*64], 8), rightShift(a[19*64:20*64], 64-8)))
 
-	copy(tAux[:], a[13*64:14*64])
-	copy(r[13*64:14*64], or(leftShift(t[:], 8), rightShift(t[:], 64-8)))
-	copy(t[:], tAux[:])
+	copy(r[12*64:13*64], or(leftShift(a[13*64:14*64], 25), rightShift(a[13*64:14*64], 64-25)))
 
-	copy(tAux[:], a[12*64:13*64])
-	copy(r[12*64:13*64], or(leftShift(t[:], 25), rightShift(t[:], 64-25)))
-	copy(t[:], tAux[:])
+	copy(r[2*64:3*64], or(leftShift(a[12*64:13*64], 43), rightShift(a[12*64:13*64], 64-43)))
 
-	copy(tAux[:], a[2*64:3*64])
-	copy(r[2*64:3*64], or(leftShift(t[:], 43), rightShift(t[:], 64-43)))
-	copy(t[:], tAux[:])
+	copy(r[20*64:21*64], or(leftShift(a[2*64:3*64], 62), rightShift(a[2*64:3*64], 64-62)))
 
-	copy(tAux[:], a[20*64:21*64])
-	copy(r[20*64:21*64], or(leftShift(t[:], 62), rightShift(t[:], 64-62)))
-	copy(t[:], tAux[:])
+	copy(r[14*64:15*64], or(leftShift(a[20*64:21*64], 18), rightShift(a[20*64:21*64], 64-18)))
 
-	copy(tAux[:], a[14*64:15*64])
-	copy(r[14*64:15*64], or(leftShift(t[:], 18), rightShift(t[:], 64-18)))
-	copy(t[:], tAux[:])
+	copy(r[22*64:23*64], or(leftShift(a[14*64:15*64], 39), rightShift(a[14*64:15*64], 64-39)))
 
-	copy(tAux[:], a[22*64:23*64])
-	copy(r[22*64:23*64], or(leftShift(t[:], 39), rightShift(t[:], 64-39)))
-	copy(t[:], tAux[:])
+	copy(r[9*64:10*64], or(leftShift(a[22*64:23*64], 61), rightShift(a[22*64:23*64], 64-61)))
 
-	copy(tAux[:], a[9*64:10*64])
-	copy(r[9*64:10*64], or(leftShift(t[:], 61), rightShift(t[:], 64-61)))
-	copy(t[:], tAux[:])
+	copy(r[6*64:7*64], or(leftShift(a[9*64:10*64], 20), rightShift(a[9*64:10*64], 64-20)))
 
-	copy(tAux[:], a[6*64:7*64])
-	copy(r[6*64:7*64], or(leftShift(t[:], 20), rightShift(t[:], 64-20)))
-	copy(t[:], tAux[:])
-
-	copy(r[1*64:2*64], or(leftShift(t[:], 44), rightShift(t[:], 64-44)))
+	copy(r[1*64:2*64], or(leftShift(a[6*64:7*64], 44), rightShift(a[6*64:7*64], 64-44)))
 	return r
 }
 

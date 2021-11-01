@@ -17,7 +17,7 @@ const wasm_tester = require("circom_tester").wasm;
 function bytesToU64(byteArray) {
     var value = 0;
     for ( var i = byteArray.length - 1; i >= 0; i--) {
-        value = (value * 256) + byteArray[i];
+	value = (value * 256) + byteArray[i];
     }
 
     return value;
@@ -26,9 +26,9 @@ function u64ToBytes(long) {
     var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
 
     for ( var index = 0; index < byteArray.length; index ++ ) {
-        var byte = long & 0xff;
-        byteArray [ index ] = byte;
-        long = (long - byte) / 256 ;
+	var byte = long & 0xff;
+	byteArray [ index ] = byte;
+	long = (long - byte) / 256 ;
     }
 
     return byteArray;
@@ -39,39 +39,41 @@ function u64ToBits(a) {
     return bytesToBits(aBytes);
 }
 function bytesToBits(b) {
-	const bits = [];
-	for (let i = 0; i < b.length; i++) {
-		for (let j = 0; j < 8; j++) {
-			if ((b[i]&(1<<j)) > 0) {
-                            bits.push(Fr.e(1));
-                        } else {
-                            bits.push(Fr.e(0));
-                        }
-		}
+    const bits = [];
+    for (let i = 0; i < b.length; i++) {
+	for (let j = 0; j < 8; j++) {
+	    if ((b[i]&(1<<j)) > 0) {
+		bits.push(Fr.e(1));
+	    } else {
+		bits.push(Fr.e(0));
+	    }
 	}
-	return bits
+    }
+    return bits
 }
 function u64ArrayToBits(u) {
-	let r = [];
-	for (let i = 0; i < u.length; i++) {
-            r = r.concat(u64ToBits(u[i]));
-	}
-	return r
+    let r = [];
+    for (let i = 0; i < u.length; i++) {
+	r = r.concat(u64ToBits(u[i]));
+    }
+    return r
 }
 function bitsToU64(b) {
-	if (b.length != 64) {
-	    console.log("b.length = ", b.length, " max=64");
-	    return;
-	}
-	const by = bitsToBytes(b)
-	return bytesToU64(by)
+    if (b.length != 64) {
+	console.log("b.length = ", b.length, " max=64");
+	return;
+    }
+    const by = bitsToBytes(b)
+    return bytesToU64(by)
 }
 function bitsToBytes(a) {
-    const len = Math.floor((a.length -1 )/8)+1;
     const b = [];
 
     for (let i=0; i<a.length; i++) {
 	const p = Math.floor(i/8);
+	if (b[p]==undefined) {
+	    b[p] = 0;
+	}
 	if (a[i]==1) {
 	    b[p] |= 1<<(i%8);
 	}
@@ -80,17 +82,17 @@ function bitsToBytes(a) {
 }
 
 function bitsToU64Array(b) {
-	const r = [];
-	for (let i = 0; i < b.length/64; i++) {
-            r.push(bitsToU64(b.slice(i*64, i*64+64)));
-	}
-	return r
+    const r = [];
+    for (let i = 0; i < b.length/64; i++) {
+	r.push(bitsToU64(b.slice(i*64, i*64+64)));
+    }
+    return r
 }
 
 function intsToBigInts(a) {
     let b = [];
     for (let i=0; i<a.length; i++) {
-        b[i] = Fr.e(a[i]);
+	b[i] = Fr.e(a[i]);
     }
     return b;
 }
@@ -99,12 +101,12 @@ describe("Utils test", function () {
     this.timeout(100000);
 
     it ("utils", async () => {
-        let a = 3;
-        let aBits = u64ToBits(a);
+	let a = 3;
+	let aBits = u64ToBits(a);
 	let a2 = bitsToU64(aBits);
 	assert.equal(a2, a);
-        a = 12345;
-        aBits = u64ToBits(a);
+	a = 12345;
+	aBits = u64ToBits(a);
 	a2 = bitsToU64(aBits);
 	assert.equal(a2, a);
 
@@ -122,14 +124,38 @@ describe("Theta test", function () {
 
     it ("Theta (testvector generated from go)", async () => {
 	const cir = await wasm_tester(path.join(__dirname, "circuits", "theta_test.circom"));
-    
+
 	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
 	const expectedOut = [26,9,13,29,47,31,14,8,22,34,16,3,3,19,37,21,24,30,12,56,14,29,25,9,51];
 	const stateIn = u64ArrayToBits(input);
 	const expectedOutBits = u64ArrayToBits(expectedOut);
-    
+
 	const witness = await cir.calculateWitness({ "in": stateIn }, true);
-    
+
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
+    });
+});
+
+describe("RhoPi test", function () {
+    this.timeout(100000);
+
+    it ("RhoPi (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "rhopi_test.circom"));
+
+	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const expectedOut = [0, 105553116266496, 105553116266496, 37748736, 393216,
+	    805306368, 9437184, 80, 562949953421312, 13835058055282163714,
+	    2, 448, 436207616, 4864, 5242880, 536870912, 343597383680,
+	    11264, 557056, 1657324662872342528, 9223372036854775808,
+	    288230376151711744, 7696581394432, 32985348833280, 84];
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+
 	const stateOut = witness.slice(1, 1+(25*64));
 	const stateOutU64 = bitsToU64Array(stateOut);
 	// console.log(stateOutU64, expectedOut);
