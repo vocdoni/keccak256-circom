@@ -111,10 +111,29 @@ describe("Utils test", function () {
 	a = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
 	aBits = u64ArrayToBits(a);
 	a2 = bitsToU64Array(aBits);
-	// console.log("a", a);
-	// console.log("a2", a2);
-    
+	// console.log(a2, a);
 	assert.deepEqual(a2, a);
+    });
+});
+
+
+describe("Theta test", function () {
+    this.timeout(100000);
+
+    it ("Theta (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "theta_test.circom"));
+    
+	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const expectedOut = [26,9,13,29,47,31,14,8,22,34,16,3,3,19,37,21,24,30,12,56,14,29,25,9,51];
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+    
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+    
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
     });
 });
 
