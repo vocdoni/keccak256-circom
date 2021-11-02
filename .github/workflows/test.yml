@@ -1,0 +1,26 @@
+name: Test
+on: [ push, pull_request ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Prepare circom
+      run: |
+        # once circom binary is published, instead of compiling from source
+        # every time, use the published binaries
+        git clone https://github.com/iden3/circom.git
+        cd circom
+        cargo build --release
+        cargo install --path circom
+    - name: run tests
+      run: |
+        npm install
+        npm run test
