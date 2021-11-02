@@ -31,10 +31,6 @@ template RhoPi() {
 
     var i;
 
-    for (i=0; i<64; i++) {
-        out[i] <== in[i];
-    }
-
     // r[10] = a[1]<<1|a[1]>>(64-1)
     component s10 = step(1, 64-1);
     for (i=0; i<64; i++) {
@@ -157,6 +153,7 @@ template RhoPi() {
     }
 
     for (i=0; i<64; i++) {
+        out[i] <== in[i];
         out[10*64+i] <== s10.out[i];
         out[7*64+i] <== s7.out[i];
         out[11*64+i] <== s11.out[i];

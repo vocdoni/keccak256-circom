@@ -163,3 +163,23 @@ describe("RhoPi test", function () {
     });
 });
 
+describe("Chi test", function () {
+    this.timeout(100000);
+
+    it ("Chi (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "chi_test.circom"));
+
+	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const expectedOut = [2, 0, 6, 3, 5, 4, 14, 6, 12, 11, 14, 10, 14, 13, 15,
+			14, 18, 16, 30, 3, 22, 20, 30, 19, 25];
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
+    });
+});
