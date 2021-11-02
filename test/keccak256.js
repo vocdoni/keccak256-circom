@@ -218,3 +218,24 @@ describe("Iota test", function () {
 	assert.deepEqual(stateOutU64, expectedOut);
     });
 });
+
+describe("Keccak-Pad test", function () {
+    this.timeout(100000);
+
+    it ("Pad (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "pad_test.circom"));
+
+	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31];
+	const expectedOut = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128];
+
+	const stateIn = bytesToBits(input);
+
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+
+	const stateOut = witness.slice(1, 1+(136*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+});
+
