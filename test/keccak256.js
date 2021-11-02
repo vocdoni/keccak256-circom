@@ -183,3 +183,38 @@ describe("Chi test", function () {
 	assert.deepEqual(stateOutU64, expectedOut);
     });
 });
+
+describe("Iota test", function () {
+    this.timeout(100000);
+
+    it ("Iota 3 (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "iota3_test.circom"));
+
+	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const expectedOut = [9223372039002292224,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
+    });
+    it ("Iota 10 (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "iota10_test.circom"));
+
+	const input = [9223372039002292224,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const expectedOut = [9223372036854775817,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
+    });
+});
