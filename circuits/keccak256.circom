@@ -65,6 +65,38 @@ template KeccakfRound(r) {
     }
 }
 
+template Absorb() {
+    var blockSizeBytes=136;
+
+    signal input s[25*64];
+    signal input block[blockSizeBytes*8];
+    signal output out[25*64];
+    var i;
+    var j;
+
+    component aux[blockSizeBytes/8];
+    component newS = Keccakf();
+
+    for (i=0; i<blockSizeBytes/8; i++) {
+        aux[i] = XorArray(64);
+        for (j=0; j<64; j++) {
+            aux[i].a[j] <== s[i*64+j];
+            aux[i].b[j] <== block[i*64+j];
+        }
+        for (j=0; j<64; j++) {
+            newS.in[i*64+j] <== aux[i].out[j];
+        }
+    }
+    // fill the missing s that was not covered by the loop over
+    // blockSizeBytes/8
+    for (i=(blockSizeBytes/8)*64; i<25*64; i++) {
+            newS.in[i] <== s[i];
+    }
+    for (i=0; i<25*64; i++) {
+        out[i] <== newS.out[i];
+    }
+}
+
 template Keccakf() {
     signal input in[25*64];
     signal output out[25*64];
