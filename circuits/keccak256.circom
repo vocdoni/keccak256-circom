@@ -64,3 +64,34 @@ template KeccakfRound(r) {
         out[i] <== iota.out[i];
     }
 }
+
+template Keccakf() {
+    signal input in[25*64];
+    signal output out[25*64];
+    var i;
+    var j;
+
+    // 24 rounds
+    component round[24];
+    signal midRound[24*25*64];
+    for (i=0; i<24; i++) {
+        round[i] = KeccakfRound(i);
+        if (i==0) {
+            for (j=0; j<25*64; j++) {
+                midRound[j] <== in[j];
+            }
+        }
+        for (j=0; j<25*64; j++) {
+            round[i].in[j] <== midRound[i*25*64+j];
+        }
+        if (i<23) {
+            for (j=0; j<25*64; j++) {
+                midRound[(i+1)*25*64+j] <== round[i].out[j];
+            }
+        }
+    }
+
+    for (i=0; i<25*64; i++) {
+        out[i] <== round[23].out[i];
+    }
+}
