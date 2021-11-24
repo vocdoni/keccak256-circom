@@ -11,29 +11,27 @@ const assert = chai.assert;
 const keccak256 = require("keccak256");
 
 const wasm_tester = require("circom_tester").wasm;
+const c_tester = require("circom_tester").c;
 
 // const printSignal = require("./helpers/printsignal");
 
 function bytesToU64(byteArray) {
-    var value = 0;
+    // var value = 0;
+    var value = Fr.e(0);
     for ( var i = byteArray.length - 1; i >= 0; i--) {
-	value = (value * 256) + byteArray[i];
+	// value = (value * 256) + byteArray[i];
+	value = Fr.add(Fr.mul(Fr.e(value), Fr.e(256)), Fr.e(byteArray[i]));
     }
 
     return value;
 }
-function u64ToBytes(long) {
-    var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+function u64ToBytes(a) {
+    var b = Fr.e(a);
 
-    for ( var index = 0; index < byteArray.length; index ++ ) {
-	var byte = long & 0xff;
-	byteArray [ index ] = byte;
-	long = (long - byte) / 256 ;
-    }
-
-    return byteArray;
+    const buff = new Uint8Array(8);
+    Scalar.toRprLE(buff, 0, b, 8);
+    return buff;
 }
-
 function u64ToBits(a) {
     const aBytes = u64ToBytes(a);
     return bytesToBits(aBytes);
@@ -42,10 +40,12 @@ function bytesToBits(b) {
     const bits = [];
     for (let i = 0; i < b.length; i++) {
 	for (let j = 0; j < 8; j++) {
-	    if ((b[i]&(1<<j)) > 0) {
-		bits.push(Fr.e(1));
+	    if ((Number(b[i])&(1<<j)) > 0) {
+		// bits.push(Fr.e(1));
+		bits.push(1);
 	    } else {
-		bits.push(Fr.e(0));
+		// bits.push(Fr.e(0));
+		bits.push(0);
 	    }
 	}
     }
@@ -89,10 +89,24 @@ function bitsToU64Array(b) {
     return r
 }
 
+function strsToBigInts(a) {
+    let b = [];
+    for (let i=0; i<a.length; i++) {
+	b[i] = Fr.e(a[i]);
+    }
+    return b;
+}
 function intsToBigInts(a) {
     let b = [];
     for (let i=0; i<a.length; i++) {
 	b[i] = Fr.e(a[i]);
+    }
+    return b;
+}
+function bigIntsToInts(a) {
+    let b = [];
+    for (let i=0; i<a.length; i++) {
+	b[i] = Number(a[i]);
     }
     return b;
 }
@@ -109,11 +123,10 @@ describe("Utils test", function () {
 	aBits = u64ToBits(a);
 	a2 = bitsToU64(aBits);
 	assert.equal(a2, a);
-
-	a = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	
+	a = intsToBigInts([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
 	aBits = u64ArrayToBits(a);
 	a2 = bitsToU64Array(aBits);
-	// console.log(a2, a);
 	assert.deepEqual(a2, a);
     });
 });
@@ -124,9 +137,56 @@ describe("Theta test", function () {
 
     it ("Theta (testvector generated from go)", async () => {
 	const cir = await wasm_tester(path.join(__dirname, "circuits", "theta_test.circom"));
+    
+	const input = intsToBigInts([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+	const expectedOut = intsToBigInts([26,9,13,29,47,31,14,8,22,34,16,3,3,19,37,21,24,30,12,56,14,29,25,9,51]);
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+    
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+    
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
+    });
+    it ("Theta (same test as previous, but using c_tester to ensure that circom_tester with c works as expected)", async () => {
+	const cir = await c_tester(path.join(__dirname, "circuits", "theta_test.circom"));
+    
+	const input = intsToBigInts([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+	const expectedOut = intsToBigInts([26,9,13,29,47,31,14,8,22,34,16,3,3,19,37,21,24,30,12,56,14,29,25,9,51]);
+	const stateIn = u64ArrayToBits(input);
+	const expectedOutBits = u64ArrayToBits(expectedOut);
+    
+	const witness = await cir.calculateWitness({ "in": stateIn }, true);
+    
+	const stateOut = witness.slice(1, 1+(25*64));
+	const stateOutU64 = bitsToU64Array(stateOut);
+	// console.log(stateOutU64, expectedOut);
+	assert.deepEqual(stateOutU64, expectedOut);
+    });
 
-	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
-	const expectedOut = [26,9,13,29,47,31,14,8,22,34,16,3,3,19,37,21,24,30,12,56,14,29,25,9,51];
+    it ("Theta (testvector generated from go)", async () => {
+	const cir = await wasm_tester(path.join(__dirname, "circuits", "theta_test.circom"));
+	// const cir = await c_tester(path.join(__dirname, "circuits", "theta_test.circom"));
+
+	const input = strsToBigInts(["26388279066651", "246290629787648", "26388279902208",
+	    "25165850", "246290605457408", "7784628352", "844424965783552",
+	    "2305843009213694083", "844432714760192", "2305843009249345539",
+	    "637534226", "14848", "641204224", "14354", "3670528", "6308236288",
+	    "2130304761856", "648518346341354496", "6309216256", "648520476645130240",
+	    "4611706359392501763", "792677514882318336", "20340965113972",
+	    "4611732197915754499", "792633534417207412"]);
+	const expectedOut = strsToBigInts(["3749081831850030700", "1297317621190464868",
+	    "10017560217643747862", "7854780639862409219", "13836147678645575967",
+	    "3749090635727681271", "1297915755455157604", "12323429615135705749",
+	    "7855062122598582297", "16141814766035214620", "3749090628446369381",
+	    "1297071330560683876", "10017586606556924438", "7854780639837253643",
+	    "13835971756788491039", "3749090634251287159", "1297070162329376100",
+	    "9369068259580659222", "7854780645071013913", "14484490034407743775",
+	    "8360757404916954740", "1801500877105239396", "10017570663003408994",
+	    "3243123208712177690", "14628605291203076459"]);
+
 	const stateIn = u64ArrayToBits(input);
 	const expectedOutBits = u64ArrayToBits(expectedOut);
 
@@ -134,9 +194,10 @@ describe("Theta test", function () {
 
 	const stateOut = witness.slice(1, 1+(25*64));
 	const stateOutU64 = bitsToU64Array(stateOut);
-	// console.log(stateOutU64, expectedOut);
 	assert.deepEqual(stateOutU64, expectedOut);
     });
+
+
 });
 
 describe("RhoPi test", function () {
@@ -145,12 +206,12 @@ describe("RhoPi test", function () {
     it ("RhoPi (testvector generated from go)", async () => {
 	const cir = await wasm_tester(path.join(__dirname, "circuits", "rhopi_test.circom"));
 
-	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
-	const expectedOut = [0, 105553116266496, 105553116266496, 37748736, 393216,
-	    805306368, 9437184, 80, 562949953421312, 13835058055282163714,
-	    2, 448, 436207616, 4864, 5242880, 536870912, 343597383680,
-	    11264, 557056, 1657324662872342528, 9223372036854775808,
-	    288230376151711744, 7696581394432, 32985348833280, 84];
+	const input = intsToBigInts([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+	const expectedOut = strsToBigInts(["0", "105553116266496", "105553116266496", "37748736", "393216",
+	    "805306368", "9437184", "80", "562949953421312", "13835058055282163714",
+	    "2", "448", "436207616", "4864", "5242880", "536870912", "343597383680",
+	    "11264", "557056", "1657324662872342528", "9223372036854775808",
+	    "288230376151711744", "7696581394432", "32985348833280", "84"]);
 	const stateIn = u64ArrayToBits(input);
 	const expectedOutBits = u64ArrayToBits(expectedOut);
 
@@ -169,9 +230,9 @@ describe("Chi test", function () {
     it ("Chi (testvector generated from go)", async () => {
 	const cir = await wasm_tester(path.join(__dirname, "circuits", "chi_test.circom"));
 
-	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
-	const expectedOut = [2, 0, 6, 3, 5, 4, 14, 6, 12, 11, 14, 10, 14, 13, 15,
-			14, 18, 16, 30, 3, 22, 20, 30, 19, 25];
+	const input = intsToBigInts([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+	const expectedOut = intsToBigInts([2, 0, 6, 3, 5, 4, 14, 6, 12, 11, 14, 10, 14, 13, 15,
+			14, 18, 16, 30, 3, 22, 20, 30, 19, 25]);
 	const stateIn = u64ArrayToBits(input);
 	const expectedOutBits = u64ArrayToBits(expectedOut);
 
@@ -190,8 +251,8 @@ describe("Iota test", function () {
     it ("Iota 3 (testvector generated from go)", async () => {
 	const cir = await wasm_tester(path.join(__dirname, "circuits", "iota3_test.circom"));
 
-	const input = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
-	const expectedOut = [9223372039002292224,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const input = intsToBigInts([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+	const expectedOut = strsToBigInts(["9223372039002292224",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
 	const stateIn = u64ArrayToBits(input);
 	const expectedOutBits = u64ArrayToBits(expectedOut);
 
@@ -205,8 +266,8 @@ describe("Iota test", function () {
     it ("Iota 10 (testvector generated from go)", async () => {
 	const cir = await wasm_tester(path.join(__dirname, "circuits", "iota10_test.circom"));
 
-	const input = [9223372039002292224,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
-	const expectedOut = [9223372036854775817,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24];
+	const input = strsToBigInts(["9223372039002292224",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
+	const expectedOut = strsToBigInts(["9223372036854775817",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
 	const stateIn = u64ArrayToBits(input);
 	const expectedOutBits = u64ArrayToBits(expectedOut);
 
@@ -238,4 +299,3 @@ describe("Keccak-Pad test", function () {
 	assert.deepEqual(stateOutBytes, expectedOut);
     });
 });
-
