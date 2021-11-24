@@ -479,3 +479,45 @@ describe("Keccak-Final test", function () {
 	assert.deepEqual(stateOutU64, expectedOut);
     });
 });
+
+describe("Keccak-Squeeze test", function () {
+    this.timeout(100000);
+
+    let cir;
+    before(async () => {
+	cir = await c_tester(path.join(__dirname, "circuits", "squeeze_test.circom"));
+	await cir.loadConstraints();
+	console.log("n_constraints", cir.constraints.length);
+    });
+
+    it ("Squeeze 1 (testvector generated from go)", async () => {
+	const input = strsToBigInts(["16852464862333879129", "9588646233186836430", "693207875935078627", "6545910230963382296", "3599194178366828471", "13130606490077331384", "10374798023615518933", "7285576075118720444", "4097382401500492461", "3968685317688314807", "3350659309646210303", "640023485234837464", "2550030127986774041", "8948768022010378840", "10678227883444996205", "1395278318096830339", "2744077813166753978", "13362598477502046010", "14601579319881128511", "4070707967569603186", "16833768365875755098", "1486295134719870048", "9161068934282437999", "8245604251371175619", "8421994351908003183"]);
+
+	const expectedOut = [89, 195, 41, 13, 129, 251, 223, 233, 206, 31, 253, 61, 242, 182, 17, 133, 227, 8, 157, 240, 227, 196, 158, 9, 24, 232, 42, 96, 172, 190, 215, 90];
+
+	const inIn = u64ArrayToBits(input);
+	const expectedOutBits = bytesToBits(expectedOut);
+
+	const witness = await cir.calculateWitness({ "s": inIn }, true);
+
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+    it ("Squeeze 2 (testvector generated from go)", async () => {
+	const input = strsToBigInts(["16953415415620100490", "7495738965189503699", "12723370805759944158", "3295955328722933810", "12121371508560456016", "174876831679863147", "15944933357501475584", "7502339663607726274", "12048918224562833898", "16715284461100269102", "15582559130083209842", "1743886467337678829", "2424196198791253761", "1116417308245482383", "10367365997906434042", "1849801549382613906", "13294939539683415102", "4478091053375708790", "2969967870313332958", "14618962068930014237", "2721742233407503451", "12003265593030191290", "8109318293656735684", "6346795302983965746", "12210038122000333046"]);
+    
+	const expectedOut = [138, 225, 170, 89, 127, 161, 70, 235, 211, 170, 44, 237, 223, 54, 6, 104, 222, 165, 229, 38, 86, 126, 146, 176, 50, 24, 22, 164, 232, 149, 189, 45];
+    
+	const inIn = u64ArrayToBits(input);
+	const expectedOutBits = bytesToBits(expectedOut);
+    
+	const witness = await cir.calculateWitness({ "s": inIn }, true);
+    
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+});

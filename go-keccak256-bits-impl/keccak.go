@@ -60,12 +60,26 @@ func absorb(s [25 * 64]bool, block []bool) [25 * 64]bool {
 }
 
 func squeeze(s [25 * 64]bool) []bool {
-	b := make([]bool, 8*8*len(s))
-	n := size * 8
-	for i := 0; i < len(s)/64; i++ {
-		copy(b[i*8*8:i*8*8+64], s[i*64:i*64+64])
-	}
-	return b[:n]
+	// option1
+	// b := make([]bool, 8*8*len(s))
+	// for i := 0; i < 25; i++ {
+	//         copy(b[i*64:i*64+64], s[i*64:i*64+64])
+	// }
+	// return b[:size*8]
+
+	// option2
+	// out := make([]bool, size*8)
+	// for i := 0; i < 25; i++ {
+	//         for j := 0; j < 64; j++ {
+	//                 if i*64+j < size*8 {
+	//                         out[i*64+j] = s[i*64+j]
+	//                 }
+	//         }
+	// }
+	// return out
+
+	// option3
+	return s[:size*8]
 }
 
 func keccakfRound(s [25 * 64]bool, r int) [25 * 64]bool {

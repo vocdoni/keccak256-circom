@@ -121,6 +121,21 @@ template Final(nBits) {
     }
 }
 
+template Squeeze(nBits) {
+    signal input s[25*64];
+    signal output out[nBits];
+    var i;
+    var j;
+
+    for (i=0; i<25; i++) {
+        for (j=0; j<64; j++) {
+            if (i*64+j<nBits) {
+                out[i*64+j] <== s[i*64+j];
+            }
+        }
+    }
+}
+
 template Keccakf() {
     signal input in[25*64];
     signal output out[25*64];
