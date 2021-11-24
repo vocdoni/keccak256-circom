@@ -9,7 +9,7 @@
   "scripts": {
     "test": "mocha --max-old-space-size=4000"
   },
-  "author": "arnaucube",
+  "author": "Vocdoni",
   "license": "GPL-3.0",
   "dependencies": {
     "circomlib": "^2.0.1"
