@@ -1,12 +1,18 @@
 pragma circom 2.0.0;
 
 include "./utils.circom";
+include "./theta.circom";
+include "./rhopi.circom";
+include "./chi.circom";
+include "./iota.circom";
 
 template Pad(nBits) {
     signal input in[nBits];
+
     var blockSize=136*8;
     signal output out[blockSize];
     signal out2[blockSize];
+
     var i;
 
     for (i=0; i<nBits; i++) {
@@ -32,15 +38,29 @@ template Pad(nBits) {
     }
 }
 
-template Keccak256(nBits) {
-    signal input in[nBits];
-    signal output out[256];
+template KeccakfRound(r) {
+    signal input in[25*64];
+    signal output out[25*64];
     var i;
 
-    // pad
-    component pad = Pad(nBits);
-    for (i=0; i<nBits; i++) {
-        pad.in[i] <== in[i];
+    component theta = Theta();
+    component rhopi = RhoPi();
+    component chi = Chi();
+    component iota = Iota(r);
+
+    for (i=0; i<25*64; i++) {
+        theta.in[i] <== in[i];
     }
-    
+    for (i=0; i<25*64; i++) {
+        rhopi.in[i] <== theta.out[i];
+    }
+    for (i=0; i<25*64; i++) {
+        chi.in[i] <== rhopi.out[i];
+    }
+    for (i=0; i<25*64; i++) {
+        iota.in[i] <== chi.out[i];
+    }
+    for (i=0; i<25*64; i++) {
+        out[i] <== iota.out[i];
+    }
 }

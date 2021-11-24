@@ -68,12 +68,16 @@ func squeeze(s [25 * 64]bool) []bool {
 	return b[:n]
 }
 
+func keccakfRound(s [25 * 64]bool, r int) [25 * 64]bool {
+	s = theta(s)
+	s = rhopi(s)
+	s = chi(s)
+	s = iot(s, r)
+	return s
+}
 func keccakf(s [25 * 64]bool) [25 * 64]bool {
 	for r := 0; r < rounds; r++ {
-		s = theta(s)
-		s = rhopi(s)
-		s = chi(s)
-		s = iot(s, r)
+		s = keccakfRound(s, r)
 	}
 	return s
 }
