@@ -97,6 +97,30 @@ template Absorb() {
     }
 }
 
+template Final(nBits) {
+    signal input in[nBits];
+    signal output out[25*64];
+    var blockSize=136*8;
+    var i;
+
+    // pad
+    component pad = Pad(nBits);
+    for (i=0; i<nBits; i++) {
+        pad.in[i] <== in[i];
+    }
+    // absorb
+    component abs = Absorb();
+    for (i=0; i<blockSize; i++) {
+        abs.block[i] <== pad.out[i];
+    }
+    for (i=0; i<25*64; i++) {
+        abs.s[i] <== 0;
+    }
+    for (i=0; i<25*64; i++) {
+        out[i] <== abs.out[i];
+    }
+}
+
 template Keccakf() {
     signal input in[25*64];
     signal output out[25*64];
