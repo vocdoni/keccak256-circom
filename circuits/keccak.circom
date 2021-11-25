@@ -1,10 +1,7 @@
 pragma circom 2.0.0;
 
 include "./utils.circom";
-include "./theta.circom";
-include "./rhopi.circom";
-include "./chi.circom";
-include "./iota.circom";
+include "./permutations.circom";
 
 template Pad(nBits) {
     signal input in[nBits];

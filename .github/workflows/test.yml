@@ -26,5 +26,6 @@ jobs:
         cargo install --path circom
     - name: run tests
       run: |
+        npm cache clean --force
         npm install
         npm run test

@@ -1,5 +1,5 @@
 pragma circom 2.0.0;
 
-include "../../circuits/theta.circom";
+include "../../circuits/permutations.circom";
 
 component main = Theta();
