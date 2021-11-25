@@ -1,3 +1,6 @@
+// Keccak256 hash function (ethereum version).
+// For LICENSE check https://github.com/vocdoni/keccak256-circom/blob/master/LICENSE
+
 pragma circom 2.0.0;
 
 include "./utils.circom";

@@ -1,3 +1,6 @@
+// Keccak256 hash function (ethereum version).
+// For LICENSE check https://github.com/vocdoni/keccak256-circom/blob/master/LICENSE
+
 pragma circom 2.0.0;
 
 include "./utils.circom";
@@ -164,20 +167,20 @@ template Keccakf() {
     }
 }
 
-template Keccak(nBits) {
-    signal input in[nBits];
-    signal output out[nBits];
+template Keccak(nBitsIn, nBitsOut) {
+    signal input in[nBitsIn];
+    signal output out[nBitsOut];
     var i;
 
-    component f = Final(nBits);
-    for (i=0; i<nBits; i++) {
+    component f = Final(nBitsIn);
+    for (i=0; i<nBitsIn; i++) {
         f.in[i] <== in[i];
     }
-    component squeeze = Squeeze(nBits);
+    component squeeze = Squeeze(nBitsOut);
     for (i=0; i<25*64; i++) {
         squeeze.s[i] <== f.out[i];
     }
-    for (i=0; i<nBits; i++) {
+    for (i=0; i<nBitsOut; i++) {
         out[i] <== squeeze.out[i];
     }
 }

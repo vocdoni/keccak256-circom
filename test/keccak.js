@@ -8,12 +8,12 @@ const c_tester = require("circom_tester").c;
 const utils = require("./utils");
 const keccak256 = require("keccak256");
 
-describe("Keccak full hash test", function () {
+describe("Keccak 32bytes full hash test", function () {
     this.timeout(100000);
 
     let cir;
     before(async () => {
-	cir = await c_tester(path.join(__dirname, "circuits", "keccak256_test.circom"));
+	cir = await c_tester(path.join(__dirname, "circuits", "keccak_256_256_test.circom"));
 	await cir.loadConstraints();
 	console.log("n_constraints", cir.constraints.length);
     });
@@ -107,5 +107,52 @@ describe("Keccak full hash test", function () {
 		input = jsOutRaw;
 	    }
 	});
+    });
+});
+
+describe("Keccak input: 4bytes, output: 32bytes, full hash test", function () {
+    this.timeout(100000);
+
+    let cir;
+    before(async () => {
+	cir = await c_tester(path.join(__dirname, "circuits", "keccak_32_256_test.circom"));
+	await cir.loadConstraints();
+	console.log("n_constraints", cir.constraints.length);
+    });
+
+    it ("Keccak inputSize==32bits: 1 (testvector generated from go)", async () => {
+	const input = [116, 101, 115, 116];
+	const expectedOut = [156, 34, 255, 95, 33, 240, 184, 27, 17, 62, 99,
+	    247, 219, 109, 169, 79, 237, 239, 17, 178, 17, 155, 64, 136, 184,
+	    150, 100, 251, 154, 60, 182, 88];
+
+	const inIn = utils.bytesToBits(input);
+
+	const witness = await cir.calculateWitness({ "in": inIn }, true);
+
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = utils.bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+
+    it ("Keccak256 inputSize==32bits, circom-js 1", async () => {
+	let input, inputBits, expectedOut, witness, stateOut, stateOutBytes;
+	input = Buffer.from("test");
+	for(let i=0; i<10; i++) {
+	    inputBits = utils.bytesToBits(input);
+
+	    let jsOutRaw = keccak256(input);
+	    expectedOut = utils.bufferToBytes(jsOutRaw);
+	    console.log(i, "in:", input.toString('hex'), "\n out:", jsOutRaw.toString('hex'));
+
+	    witness = await cir.calculateWitness({ "in": inputBits }, true);
+	    stateOut = witness.slice(1, 1+(32*8));
+	    stateOutBytes = utils.bitsToBytes(stateOut);
+	    assert.deepEqual(stateOutBytes, expectedOut);
+
+	    // assign output[0:4] into input for next iteration
+	    input = jsOutRaw.slice(0, 4);
+	}
     });
 });
