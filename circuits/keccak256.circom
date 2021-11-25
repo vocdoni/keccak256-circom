@@ -166,3 +166,21 @@ template Keccakf() {
         out[i] <== round[23].out[i];
     }
 }
+
+template Keccak(nBits) {
+    signal input in[nBits];
+    signal output out[nBits];
+    var i;
+
+    component f = Final(nBits);
+    for (i=0; i<nBits; i++) {
+        f.in[i] <== in[i];
+    }
+    component squeeze = Squeeze(nBits);
+    for (i=0; i<25*64; i++) {
+        squeeze.s[i] <== f.out[i];
+    }
+    for (i=0; i<nBits; i++) {
+        out[i] <== squeeze.out[i];
+    }
+}

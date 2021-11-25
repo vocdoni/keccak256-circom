@@ -1,7 +1,6 @@
 package keccak
 
 import (
-	"encoding/hex"
 	"fmt"
 	"testing"
 
@@ -10,19 +9,54 @@ import (
 )
 
 func TestKeccak(t *testing.T) {
-	testKeccak(t, []byte("test"), "9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658")
-	testKeccak(t, make([]byte, 32), "290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563")
-	testKeccak(t, make([]byte, 100), "913fb9e1f6f1c6d910fd574a5cad8857aa43bfba24e401ada4f56090d4d997a7")
+	// 32 bytes input
+	// 1
+	testKeccak(t, []byte{116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]byte{37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65,
+			228, 211, 170, 133, 153, 9, 88, 212, 4, 212, 175, 238, 249,
+			210, 214, 116, 170, 85, 45, 21})
+	// 2
+	testKeccak(t, []byte{37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143,
+		65, 228, 211, 170, 133, 153, 9, 88, 212, 4, 212, 175, 238, 249, 210,
+		214, 116, 170, 85, 45, 21},
+		[]byte{182, 104, 121, 2, 8, 48, 224, 11, 238, 244, 73, 142, 67,
+			205, 166, 27, 10, 223, 142, 209, 10, 46, 171, 110, 239, 68,
+			111, 116, 164, 127, 103, 141})
+	// 3
+	testKeccak(t, []byte{182, 104, 121, 2, 8, 48, 224, 11, 238, 244, 73,
+		142, 67, 205, 166, 27, 10, 223, 142, 209, 10, 46, 171, 110, 239, 68,
+		111, 116, 164, 127, 103, 141},
+		[]byte{191, 235, 249, 254, 70, 24, 106, 244, 212, 163, 52, 240,
+			1, 128, 235, 61, 158, 52, 138, 60, 197, 80, 113, 36, 44, 217,
+			55, 211, 97, 231, 26, 7})
+	// 4
+	testKeccak(t, make([]byte, 32), []byte{41, 13, 236, 217, 84, 139, 98,
+		168, 214, 3, 69, 169, 136, 56, 111, 200, 75, 166, 188, 149, 72, 64, 8,
+		246, 54, 47, 147, 22, 14, 243, 229, 99})
+
+	// variable input length
+	testKeccak(t, []byte("test"), []byte{156, 34, 255, 95, 33, 240, 184,
+		27, 17, 62, 99, 247, 219, 109, 169, 79, 237, 239, 17, 178, 17, 155, 64,
+		136, 184, 150, 100, 251, 154, 60, 182, 88})
+	// other
+	testKeccak(t, make([]byte, 100), []byte{145, 63, 185, 225, 246, 241,
+		198, 217, 16, 253, 87, 74, 92, 173, 136, 87, 170, 67, 191, 186, 36,
+		228, 1, 173, 164, 245, 96, 144, 212, 217, 151, 167})
 }
 
-func testKeccak(t *testing.T, input []byte, expectedHex string) {
-	expected := crypto.Keccak256(input)
+func testKeccak(t *testing.T, input, expected []byte) {
+	// printBytes("in", input, false)
+
+	goH := crypto.Keccak256(input)
 
 	hBits := ComputeKeccak(bytesToBits(input))
 	h := bitsToBytes(hBits)
 
+	// printBytes("out", goH, false)
+
+	qt.Assert(t, h, qt.DeepEquals, goH)
 	qt.Assert(t, h, qt.DeepEquals, expected)
-	qt.Assert(t, hex.EncodeToString(h), qt.Equals, expectedHex)
 }
 
 func TestPad(t *testing.T) {
@@ -108,17 +142,25 @@ func TestKeccakf(t *testing.T) {
 			13518516210247555620})
 }
 
-func printBytes(name string, b []byte) {
+func printBytes(name string, b []byte, str bool) {
 	fmt.Printf("%s\n", name)
 	for _, v := range b {
-		fmt.Printf("\"%v\", ", v)
+		if str {
+			fmt.Printf("\"%v\", ", v)
+		} else {
+			fmt.Printf("%v, ", v)
+		}
 	}
 	fmt.Println("")
 }
-func printU64Array(name string, b []uint64) {
+func printU64Array(name string, b []uint64, str bool) {
 	fmt.Printf("%s\n", name)
 	for _, v := range b {
-		fmt.Printf("\"%v\", ", v)
+		if str {
+			fmt.Printf("\"%v\", ", v)
+		} else {
+			fmt.Printf("%v, ", v)
+		}
 	}
 	fmt.Println("")
 }
@@ -132,11 +174,11 @@ func TestAbsorb(t *testing.T) {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128}
-	// printU64Array("s", bitsToU64Array(s[:]))
-	// printBytes("block", block[:])
+	// printU64Array("s", bitsToU64Array(s[:]), true)
+	// printBytes("block", block[:], true)
 
 	absorbed := absorb(s, bytesToBits(block))
-	// printU64Array("absorbed", bitsToU64Array(absorbed[:]))
+	// printU64Array("absorbed", bitsToU64Array(absorbed[:]), true)
 
 	qt.Assert(t, bitsToU64Array(absorbed[:]), qt.DeepEquals,
 		[]uint64{8342348566319207042, 319359607942176202, 14410076088654599075,
@@ -150,7 +192,7 @@ func TestAbsorb(t *testing.T) {
 			10946808592826700411})
 
 	absorbed = absorb(absorbed, bytesToBits(block))
-	// printU64Array("absorbed", bitsToU64Array(absorbed[:]))
+	// printU64Array("absorbed", bitsToU64Array(absorbed[:]), true)
 
 	qt.Assert(t, bitsToU64Array(absorbed[:]), qt.DeepEquals,
 		[]uint64{8909243822027471379, 1111840847970088140,
@@ -173,8 +215,8 @@ func TestFinal(t *testing.T) {
 
 	fBits := final(bBits)
 
-	// printBytes("in", b[:])
-	// printU64Array("out", bitsToU64Array(fBits[:]))
+	// printBytes("in", b[:], true)
+	// printU64Array("out", bitsToU64Array(fBits[:]), true)
 
 	qt.Assert(t, bitsToU64Array(fBits[:]), qt.DeepEquals,
 		[]uint64{16953415415620100490, 7495738965189503699,
@@ -197,8 +239,8 @@ func TestFinal(t *testing.T) {
 	bBits = bytesToBits(b)
 	fBits = final(bBits)
 
-	// printBytes("in", b[:])
-	// printU64Array("out", bitsToU64Array(fBits[:]))
+	// printBytes("in", b[:], true)
+	// printU64Array("out", bitsToU64Array(fBits[:]), true)
 	qt.Assert(t, bitsToU64Array(fBits[:]), qt.DeepEquals,
 		[]uint64{16852464862333879129, 9588646233186836430, 693207875935078627,
 			6545910230963382296, 3599194178366828471, 13130606490077331384,
@@ -227,8 +269,8 @@ func TestSqueeze(t *testing.T) {
 
 	outBits := squeeze(inBits1600)
 
-	// printU64Array("in", in)
-	// printBytes("out", bitsToBytes(outBits[:]))
+	// printU64Array("in", in, true)
+	// printBytes("out", bitsToBytes(outBits[:]), true)
 
 	qt.Assert(t, bitsToBytes(outBits[:]), qt.DeepEquals,
 		[]byte{89, 195, 41, 13, 129, 251, 223, 233, 206, 31, 253, 61,
@@ -250,8 +292,8 @@ func TestSqueeze(t *testing.T) {
 
 	outBits = squeeze(inBits1600)
 
-	// printU64Array("in", in)
-	// printBytes("out", bitsToBytes(outBits[:]))
+	// printU64Array("in", in, true)
+	// printBytes("out", bitsToBytes(outBits[:]), true)
 	qt.Assert(t, bitsToBytes(outBits[:]), qt.DeepEquals,
 		[]byte{138, 225, 170, 89, 127, 161, 70, 235, 211, 170, 44, 237,
 			223, 54, 6, 104, 222, 165, 229, 38, 86, 126, 146, 176, 50, 24,

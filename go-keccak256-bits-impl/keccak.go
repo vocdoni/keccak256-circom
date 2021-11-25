@@ -38,6 +38,7 @@ func final(b []bool) [25 * 64]bool {
 	s = absorb(s, last)
 	return s
 }
+
 func pad(b []bool) []bool {
 	padded := make([]bool, blockSize*8)
 	copy(padded, b)
@@ -46,6 +47,7 @@ func pad(b []bool) []bool {
 		or(padded[(len(padded)-8):], byteToBits(0x80)))
 	return padded
 }
+
 func absorb(s [25 * 64]bool, block []bool) [25 * 64]bool {
 	if len(block) != blockSize*8 {
 		panic(fmt.Errorf("absorb: invalid block size: %d, expected: %d",

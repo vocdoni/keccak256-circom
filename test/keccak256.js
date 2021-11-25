@@ -521,3 +521,81 @@ describe("Keccak-Squeeze test", function () {
 	assert.deepEqual(stateOutBytes, expectedOut);
     });
 });
+
+describe("Keccak full hash test", function () {
+    this.timeout(100000);
+
+    let cir;
+    before(async () => {
+	cir = await c_tester(path.join(__dirname, "circuits", "keccak256_test.circom"));
+	await cir.loadConstraints();
+	console.log("n_constraints", cir.constraints.length);
+    });
+
+    it ("Keccak 1 (testvector generated from go)", async () => {
+	const input = [116, 101, 115, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	const expectedOut = [37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143,
+	    65, 228, 211, 170, 133, 153, 9, 88, 212, 4, 212, 175, 238, 249,
+	    210, 214, 116, 170, 85, 45, 21];
+
+	const inIn = bytesToBits(input);
+
+	const witness = await cir.calculateWitness({ "in": inIn }, true);
+
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+    it ("Keccak 2 (testvector generated from go)", async () => {
+	const input = [37, 17, 98, 135, 161, 178, 88, 97, 125, 150, 143, 65,
+	    228, 211, 170, 133, 153, 9, 88, 212, 4, 212, 175, 238, 249, 210,
+	    214, 116, 170, 85, 45, 21];
+	const expectedOut = [182, 104, 121, 2, 8, 48, 224, 11, 238, 244, 73,
+	    142, 67, 205, 166, 27, 10, 223, 142, 209, 10, 46, 171, 110, 239,
+	    68, 111, 116, 164, 127, 103, 141];
+
+	const inIn = bytesToBits(input);
+
+	const witness = await cir.calculateWitness({ "in": inIn }, true);
+
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+    it ("Keccak 3 (testvector generated from go)", async () => {
+	const input = [182, 104, 121, 2, 8, 48, 224, 11, 238, 244, 73, 142, 67,
+	    205, 166, 27, 10, 223, 142, 209, 10, 46, 171, 110, 239, 68, 111,
+	    116, 164, 127, 103, 141];
+	const expectedOut = [191, 235, 249, 254, 70, 24, 106, 244, 212, 163,
+	    52, 240, 1, 128, 235, 61, 158, 52, 138, 60, 197, 80, 113, 36, 44,
+	    217, 55, 211, 97, 231, 26, 7];
+
+	const inIn = bytesToBits(input);
+
+	const witness = await cir.calculateWitness({ "in": inIn }, true);
+
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+    it ("Keccak 4 (testvector generated from go)", async () => {
+	const input = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	const expectedOut = [41, 13, 236, 217, 84, 139, 98, 168, 214, 3, 69,
+	    169, 136, 56, 111, 200, 75, 166, 188, 149, 72, 64, 8, 246, 54, 47,
+	    147, 22, 14, 243, 229, 99];
+
+	const inIn = bytesToBits(input);
+
+	const witness = await cir.calculateWitness({ "in": inIn }, true);
+
+	const stateOut = witness.slice(1, 1+(32*8));
+	const stateOutBytes = bitsToBytes(stateOut);
+	// console.log(stateOutBytes, expectedOut);
+	assert.deepEqual(stateOutBytes, expectedOut);
+    });
+});
